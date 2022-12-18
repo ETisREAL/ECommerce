@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+Product Detail
+
+{% block content %}
+  <ul>
+    <li>SKU {{product.product__name}}</li>
+    <li>Price: {{product.sku}}</li>
+    <li>{{product.store_price}}$</li>
+    <li>Stock: {{product.product_inventory__units}}</li>
+  </ul>
+  
+  <ul>
+  {% for selected in z %}
+  <li>
+    {{selected.product_attribute__name}}:
+    <ul>
+    {% for attribute in y %}
+      {% if attribute.attribute_values__product_attribute__name == selected.product_attribute__name %}
+        {% if attribute.attribute_values__attribute_value in product.field_a %}
+          <li id="target-{{attribute.attribute_values__attribute_value}}" class="selected fw-bold" data-attribute="{{selected.product_attribute__name}}" value="{{attribute.attribute_values__attribute_value}}">{{attribute.attribute_values__attribute_value}}</li>
+        {% else %}
+          <li id="target-{{attribute.attribute_values__attribute_value}}" data-attribute="{{selected.product_attribute__name}}" value="{{attribute.attribute_values__attribute_value}}">{{attribute.attribute_values__attribute_value}}</li>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+  </ul>
+        
+        
+  <script>
+    const textBoxes = document.querySelectorAll('[id^=target]');
+    let d = {};
+  
+    textBoxes.forEach(function(textBox) {
+      if (textBox.classList.contains('selected')) {
+        d[textBox.getAttribute('data-attribute')] = textBox.getAttribute('value')
+      }
+
+      textBox.addEventListener('click', e => {
+        d[e.target.getAttribute('data-attribute')] = e.target.getAttribute('value');
+        let queryString = buildUrlWithParameters(d);
+        let url = window.location.href.split('?')[0];
+        window.location.href = url+'?'+queryString;
+      }, false);
+    })
+
+    function buildUrlWithParameters(data) {
+      let searchParams = [];
+
+      for (let d in data)
+        searchParams.push(d + '=' + data[d]);
+      return searchParams.join('&');
+    };
+  </script>
+
+{% endblock content %}
+    

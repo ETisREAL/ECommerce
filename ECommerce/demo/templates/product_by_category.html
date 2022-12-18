@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<ul>
+    {% for obj in data %}
+        <li>{{obj.name}} [<a href="{% url 'demo:product_detail' slug=obj.slug %}">View</a>]</li>
+        <li>{{obj.id}}</li>
+        <li>Price: ${{obj.product__store_price}}</li>
+        <br>
+    {% endfor %}
+</ul>    
+{% endblock content %}
+    

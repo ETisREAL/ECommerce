@@ -24,7 +24,6 @@ class Category(MPTTModel):
         related_name='children',
         null=True,
         blank=True,
-        unique=False,
         )
 
     class MPTTMeta:
@@ -52,7 +51,9 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=150)
     description = models.TextField(help_text='Required')
+
     category = TreeManyToManyField(Category)
+
     is_active = models.BooleanField(
         default=False,
         verbose_name=_('product visibility'),
@@ -63,17 +64,6 @@ class Product(models.Model):
         help_text=_('format: Y-m-d H:M:S'),
         )
     updated_at = models.DateTimeField(auto_now=True, help_text=_('format: Y-m-d H:M:S'))
-
-    def __str__(self):
-        return self.name
-
-
-class ProductType(models.Model):
-
-    name = models.CharField(
-        max_length=255,
-        unique=True,
-    )
 
     def __str__(self):
         return self.name
@@ -91,6 +81,23 @@ class ProductAttribute(models.Model):
 
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ProductType(models.Model):
+
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+    )
+
+    product_type_attribute = models.ManyToManyField(
+        ProductAttribute,
+        related_name='product_type_attributes',
+        through='ProductTypeAttribute'
+    )
 
     def __str__(self):
         return self.name
@@ -138,6 +145,10 @@ class ProductInventory(models.Model):
     is_active = models.BooleanField(
         default=False,
         verbose_name=_('product visibility')
+    )
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name=_('default selection')
     )
     retail_price = models.DecimalField(
         max_digits=5,
@@ -253,3 +264,20 @@ class ProductAttributeLinkTable(models.Model):
 
     class Meta:
         unique_together = (('attribute_values', 'product_inventory'),)
+
+
+class ProductTypeAttribute(models.Model):
+    
+    product_attribute = models.ForeignKey(
+        ProductAttribute,
+        related_name='productattribute',
+        on_delete=models.PROTECT
+    )
+    product_type = models.ForeignKey(
+        ProductType, 
+        related_name='producttype',
+        on_delete=models.PROTECT
+    )
+
+    class Meta:
+        unique_together=('product_attribute', 'product_type')

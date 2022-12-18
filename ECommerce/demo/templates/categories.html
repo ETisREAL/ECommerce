@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+    <h1>Categories</h1>
+    <br>
+    <hr>
+
+    {% for instance in data %}
+        <a href="{% url 'demo:product_by_category' category=instance.slug %}">{{instance.name}}</a>
+        <br>
+    {% endfor %}
+{% endblock content %}
+    
+    
